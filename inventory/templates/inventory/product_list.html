@@ -1,27 +1,47 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Inventory - Product List</title>
-</head>
-<body>
-    <h1>Product List</h1>
-    <table border="1" cellpadding="10">
-        <tr>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Last Updated</th>
-        </tr>
-        {% for product in products %}
-        <tr>
-            <td>{{ product.name }}</td>
-            <td>{{ product.category.name }}</td>
-            <td>{{ product.quantity }}</td>
-            <td>{{ product.price }}</td>
-            <td>{{ product.updated_at }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-</body>
-</html>
+
+{% extends 'inventory/base.html' %}
+{% load static %}
+{% block title %}Products{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Products</h2>
+    <a href="{% url 'product-create' %}" class="btn btn-primary">➕ Add Product</a>
+</div>
+
+<form method="get" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="q" class="form-control" placeholder="Search products..." value="{{ request.GET.q }}">
+        <button class="btn btn-outline-secondary" type="submit">Search</button>
+    </div>
+</form>
+
+{% if products %}
+<div class="row g-4">
+    {% for product in products %}
+    <div class="col-md-4">
+        <div class="card shadow-sm h-100">
+            {% if product.image %}
+            <img src="{{ product.image.url }}" class="card-img-top" style="height:200px; object-fit:cover;" alt="{{ product.name }}">
+            {% else %}
+            <img src="{% static 'images/no-image.png' %}" class="card-img-top" style="height:200px; object-fit:cover;" alt="No image">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ product.name }}</h5>
+                <p class="card-text text-muted">{{ product.category.name }}</p>
+                <p class="card-text">Stock: <strong>{{ product.quantity }}</strong></p>
+                <p class="card-text text-success">Price: ${{ product.price }}</p>
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'product-detail' product.pk %}" class="btn btn-sm btn-info">View</a>
+                    <a href="{% url 'product-update' product.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                    <a href="{% url 'product-delete' product.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">No products found.</div>
+{% endif %}
+{% endblock %}
+

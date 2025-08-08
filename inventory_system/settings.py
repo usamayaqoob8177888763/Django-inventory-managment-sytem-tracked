@@ -24,12 +24,12 @@ INSTALLED_APPS = [
     'inventory',
     'users',
 
-    # Third-party
+    # Third-party apps
     'crispy_forms',
     'django.contrib.humanize',
 ]
 
-# Crispy Forms (optional)
+# Crispy Forms
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # Middleware
@@ -49,7 +49,7 @@ ROOT_URLCONF = 'inventory_system.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # 👈 Add templates folder
+        'DIRS': [BASE_DIR / 'templates'],  # Global templates folder
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -90,20 +90,23 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'Asia/Kolkata'  # Change if needed
+TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
 # Static & Media Files
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
+STATICFILES_DIRS = [BASE_DIR / 'static']  # Where you keep development static files
+STATIC_ROOT = BASE_DIR / 'staticfiles'    # Where collectstatic will copy files for production
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Authentication
+# Authentication redirects
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/login/'
 
 # Default primary key type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
