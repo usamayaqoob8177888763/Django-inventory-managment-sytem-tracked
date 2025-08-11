@@ -1,0 +1,38 @@
+{% extends 'inventory/base.html' %}
+{% block content %}
+<h2>Order #{{ order.id }}</h2>
+
+<div class="mb-3">
+    <strong>Customer:</strong> {{ order.customer.name }}<br>
+    <strong>Phone:</strong> {{ order.customer.phone }}<br>
+    <strong>Date:</strong> {{ order.created_at|date:"Y-m-d H:i" }}<br>
+    <strong>Status:</strong> {{ order.payment_status|title }}<br>
+</div>
+
+<h4>Items</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Qty</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for item in order.items.all %}
+        <tr>
+            <td>{{ item.product.name }}</td>
+            <td>{{ item.price }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.get_total }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<h4 class="text-end">Total: {{ order.total_amount }}</h4>
+
+<a href="{% url 'billing:order_list' %}" class="btn btn-secondary">Back to Orders</a>
+<a href="{% url 'billing:order_invoice' order.id %}" class="btn btn-primary">Download Invoice</a>
+{% endblock %}

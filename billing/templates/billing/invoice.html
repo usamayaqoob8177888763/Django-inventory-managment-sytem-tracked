@@ -1,0 +1,63 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Invoice #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white">
+            <h4 class="mb-0">Invoice #{{ order.id }}</h4>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col">
+                    <h5>From</h5>
+                    <p><strong>My Store</strong><br>123 Business Rd<br>City, Country</p>
+                </div>
+                <div class="col text-end">
+                    <h5>To</h5>
+                    <p><strong>{{ order.customer.name }}</strong><br>{{ order.customer.phone }}</p>
+                </div>
+            </div>
+
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Qty</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items.all %}
+                    <tr>
+                        <td>{{ item.product.name }}</td>
+                        <td>₹{{ item.price|floatformat:2 }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>₹{{ item.subtotal|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="text-end mt-4">
+                <p><strong>Tax:</strong> ₹{{ order.tax|floatformat:2 }}</p>
+                <p><strong>Discount:</strong> ₹{{ order.discount|floatformat:2 }}</p>
+                <h4><strong>Total:</strong> ₹{{ order.total|floatformat:2 }}</h4>
+            </div>
+
+            <div class="text-center mt-4">
+                <button class="btn btn-primary" onclick="window.print()">Print Invoice</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<p><strong>Subtotal:</strong> {{ order.subtotal }}<br>
+<strong>Tax:</strong> {{ order.tax }}<br>
+<strong>Discount:</strong> {{ order.discount }}<br>
+<strong>Total:</strong> {{ order.total }}</p>
+
+<a href="{% url 'invoice_pdf' order.id %}" class="btn btn-success">Download PDF</a>
+{% endblock %}

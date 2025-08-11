@@ -1,0 +1,36 @@
+{% extends 'inventory/base.html' %}
+{% block content %}
+<h2>Orders</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for order in orders %}
+        <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.customer.name }}</td>
+            <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+            <td>{{ order.total_amount }}</td>
+            <td>{{ order.payment_status|title }}</td>
+            <td>
+                <a href="{% url 'billing:order_detail' order.id %}" class="btn btn-sm btn-info">View</a>
+                <a href="{% url 'billing:order_invoice' order.id %}" class="btn btn-sm btn-secondary">Invoice</a>
+            </td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="6" class="text-center">No orders found</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

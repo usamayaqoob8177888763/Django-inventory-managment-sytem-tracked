@@ -1,0 +1,79 @@
+{% extends 'inventory/base.html' %}
+
+{% block title %}Create Order{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-lg border-0 rounded-3">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">🛒 Create New Order</h4>
+        </div>
+        <div class="card-body">
+            <form method="post" class="needs-validation" novalidate>
+                {% csrf_token %}
+                
+                <!-- Customer selection -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Customer</label>
+                    <select name="customer" class="form-select" required>
+                        {% for cust in customers %}
+                            <option value="{{ cust.id }}">{{ cust.name }} - {{ cust.phone }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Product table -->
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product</th>
+                                <th>Price</th>
+                                <th>Available</th>
+                                <th>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr>
+                                <td>{{ product.name }}</td>
+                                <td>₹{{ product.price|floatformat:2 }}</td>
+                                <td>{{ product.quantity }}</td>
+                                <td style="max-width: 100px;">
+                                    <input type="number" name="product_{{ product.id }}" value="0" min="0" max="{{ product.quantity }}" class="form-control form-control-sm">
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Tax, Discount, Payment Status -->
+                <div class="row g-3 mt-3">
+                    <div class="col-md">
+                        <input type="number" name="tax" placeholder="Tax" class="form-control" step="0.01">
+                    </div>
+                    <div class="col-md">
+                        <input type="number" name="discount" placeholder="Discount" class="form-control" step="0.01">
+                    </div>
+                    <div class="col-md">
+                        <select name="payment_status" class="form-select">
+                            <option value="paid">Paid</option>
+                            <option value="partial">Partial</option>
+                            <option value="unpaid" selected>Unpaid</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="mt-4 text-end">
+                    <button class="btn btn-success px-4" type="submit">
+                        <i class="bi bi-check-circle me-1"></i> Create Order
+                    </button>
+                    <a href="{% url 'billing:order_list' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
