@@ -1,0 +1,17 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Delete Order{% endblock %}
+{% block content %}
+<div class="card border-danger">
+  <div class="card-header bg-danger text-white">Confirm Delete</div>
+  <div class="card-body">
+    <p class="mb-0">Are you sure you want to delete order <strong>{{ order.invoice_number }}</strong>?</p>
+  </div>
+  <div class="card-footer d-flex justify-content-end gap-2">
+    <a href="{% url 'billing:order_detail' order.id %}" class="btn btn-outline-secondary">Cancel</a>
+    <form method="post">
+      {% csrf_token %}
+      <button class="btn btn-danger">Delete</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

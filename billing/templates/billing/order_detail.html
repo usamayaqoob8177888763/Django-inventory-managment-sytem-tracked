@@ -1,38 +1,110 @@
 {% extends 'inventory/base.html' %}
+{% block title %}Order {{ order.invoice_number }}{% endblock %}
 {% block content %}
-<h2>Order #{{ order.id }}</h2>
-
-<div class="mb-3">
-    <strong>Customer:</strong> {{ order.customer.name }}<br>
-    <strong>Phone:</strong> {{ order.customer.phone }}<br>
-    <strong>Date:</strong> {{ order.created_at|date:"Y-m-d H:i" }}<br>
-    <strong>Status:</strong> {{ order.payment_status|title }}<br>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Order {{ order.invoice_number }}</h4>
+  <div>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'billing:invoice_view' order.id %}">Invoice</a>
+    <a class="btn btn-outline-dark btn-sm" href="{% url 'billing:invoice_pdf' order.id %}">PDF</a>
+  </div>
 </div>
 
-<h4>Items</h4>
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>Price</th>
-            <th>Qty</th>
-            <th>Subtotal</th>
-        </tr>
-    </thead>
-    <tbody>
-    {% for item in order.items.all %}
-        <tr>
-            <td>{{ item.product.name }}</td>
-            <td>{{ item.price }}</td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.get_total }}</td>
-        </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">Items</div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <thead class="table-light">
+            <tr><th>#</th><th>Product</th><th>Price</th><th>Qty</th><th>Total</th></tr>
+          </thead>
+          <tbody>
+          {% for it in items %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ it.product.name }}</td>
+              <td>{{ it.unit_price }}</td>
+              <td>{{ it.quantity }}</td>
+              <td>{{ it.line_total }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer text-end">
+        <div>Subtotal: <strong>{{ order.subtotal }}</strong></div>
+        <div>Tax: <strong>{{ order.tax }}</strong></div>
+        <div>Discount: <strong>{{ order.discount }}</strong></div>
+        <div class="mt-2 h5">Grand Total: <strong>{{ order.total }}</strong></div>
+        <div>Paid: <strong>{{ order.amount_paid }}</strong></div>
+        <div>Balance: <strong>{{ order.balance }}</strong></div>
+        <div>Status:
+          {% if order.payment_status == 'paid' %}
+            <span class="badge bg-success">Paid</span>
+          {% elif order.payment_status == 'partial' %}
+            <span class="badge bg-warning text-dark">Partial</span>
+          {% else %}
+            <span class="badge bg-secondary">Unpaid</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
 
-<h4 class="text-end">Total: {{ order.total_amount }}</h4>
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header">Add Payment</div>
+      <div class="card-body">
+        <form method="post" action="{% url 'billing:add_payment' order.id %}">
+          {% csrf_token %}
+          <div class="mb-2">
+            <label class="form-label">Amount</label>
+            <input name="amount" step="0.01" type="number" class="form-control" required>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Method</label>
+            <select name="method" class="form-select">
+              <option value="cash">Cash</option>
+              <option value="card">Card</option>
+              <option value="bank">Bank Transfer</option>
+              <option value="online">Online</option>
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Reference</label>
+            <input name="reference" class="form-control">
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Notes</label>
+            <textarea name="notes" class="form-control" rows="2"></textarea>
+          </div>
+          <button class="btn btn-primary w-100">Save Payment</button>
+        </form>
+      </div>
+    </div>
 
-<a href="{% url 'billing:order_list' %}" class="btn btn-secondary">Back to Orders</a>
-<a href="{% url 'billing:order_invoice' order.id %}" class="btn btn-primary">Download Invoice</a>
+    <div class="card mt-3">
+      <div class="card-header">Payments</div>
+      <div class="card-body p-0">
+        <table class="table mb-0">
+          <thead class="table-light">
+            <tr><th>Date</th><th>Amount</th><th>Method</th></tr>
+          </thead>
+          <tbody>
+          {% for p in payments %}
+            <tr>
+              <td>{{ p.date|date:"d M Y, H:i" }}</td>
+              <td>{{ p.amount }}</td>
+              <td>{{ p.get_method_display }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="3" class="text-center text-muted">No payments.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
 {% endblock %}

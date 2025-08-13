@@ -1,0 +1,114 @@
+{% load billing_extras %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Invoice #{{ order.invoice_number }}</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; color: #333; }
+        .header { display: flex; align-items: center; margin-bottom: 20px; }
+        .logo { height: 70px; margin-right: 20px; }
+        .company-info { font-size: 13px; }
+        .company-info strong { font-size: 16px; }
+        hr { border: none; border-top: 2px solid #555; margin: 15px 0; }
+
+        h1 { font-size: 20px; margin-bottom: 5px; }
+        h2 { font-size: 18px; margin-top: 0; }
+        p { margin: 3px 0; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; font-weight: bold; }
+        td { vertical-align: top; }
+
+        .totals { margin-top: 20px; width: 300px; float: right; }
+        .totals table { border: none; }
+        .totals th, .totals td { border: none; padding: 5px; }
+        .totals th { text-align: left; }
+        .totals td { text-align: right; }
+
+        .footer { margin-top: 50px; font-size: 12px; text-align: center; color: #777; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <img class="logo" src="{{ logo_url }}" alt="Company Logo">
+        <div class="company-info">
+            <strong>{{ company_name }}</strong><br>
+            {{ company_address }}<br>
+            Phone: {{ company_phone }}<br>
+            Email: {{ company_email }}
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- Invoice Title -->
+    <h1>Invoice</h1>
+    <p><strong>Invoice #:</strong> {{ order.invoice_number }}</p>
+    <p><strong>Date:</strong> {{ order.date|date:"d M Y, H:i" }}</p>
+
+    <!-- Customer Info -->
+    <h2>Bill To:</h2>
+    <p>{{ order.customer.name }}</p>
+    <p>{{ order.customer.phone }}</p>
+    {% if order.customer.email %}
+    <p>{{ order.customer.email }}</p>
+    {% endif %}
+
+    <!-- Order Items -->
+    <table>
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th style="text-align:right;">Unit Price</th>
+                <th style="text-align:center;">Qty</th>
+                <th style="text-align:right;">Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td style="text-align:right;">₹{{ item.unit_price|floatformat:2 }}</td>
+                <td style="text-align:center;">{{ item.quantity }}</td>
+                <td style="text-align:right;">₹{{ item.unit_price|mul:item.quantity|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Totals -->
+    <div class="totals">
+        <table>
+            <tr>
+                <th>Subtotal:</th>
+                <td>₹{{ order.subtotal|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <th>Tax:</th>
+                <td>₹{{ order.tax|floatformat:2 }}</td>
+            </tr>
+            <tr>
+                <th>Discount:</th>
+                <td>- ₹{{ order.discount|floatformat:2 }}</td>
+            </tr>
+            <tr style="border-top:2px solid #333; font-size:16px; font-weight:bold;">
+                <th>Total:</th>
+                <td>₹{{ order.total|floatformat:2 }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="clear:both;"></div>
+
+    <!-- Footer -->
+    <div class="footer">
+        Thank you for your business!<br>
+        {{ company_name }} - {{ company_phone }}
+    </div>
+
+</body>
+</html>

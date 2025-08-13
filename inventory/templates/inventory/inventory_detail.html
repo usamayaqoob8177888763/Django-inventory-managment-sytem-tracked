@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ item.name }} Details{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h2>{{ item.name }}</h2>
+  </div>
+  <div class="card-body">
+    <p>{{ item.description }}</p>
+    <p><strong>Current Rate:</strong> ${{ item.rate }}</p>
+
+    <form method="post" class="row g-3">
+      {% csrf_token %}
+      <div class="col-auto">
+        <label for="rate" class="form-label">Set New Rate:</label>
+        <input
+          type="number"
+          name="rate"
+          id="rate"
+          step="0.01"
+          class="form-control"
+          required
+          placeholder="Enter new rate"
+        />
+      </div>
+      <div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-success">Update Rate</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<a href="{% url 'inventory:inventory-list' %}" class="btn btn-link mt-3">&larr; Back to Inventory</a>
+{% endblock %}

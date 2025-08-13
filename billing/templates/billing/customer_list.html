@@ -1,51 +1,36 @@
 {% extends 'inventory/base.html' %}
 {% block title %}Customers{% endblock %}
-
 {% block content %}
-<div class="container mt-4">
-    <div class="card shadow border-0">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0">👥 Customers</h4>
-            <a href="{% url 'billing:customer_create' %}" class="btn btn-light btn-sm">
-                <i class="bi bi-plus-lg"></i> Add Customer
-            </a>
-        </div>
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Phone</th>
-                            <th>Email</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for customer in customers %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ customer.name }}</td>
-                            <td>{{ customer.phone }}</td>
-                            <td>{{ customer.email|default:"—" }}</td>
-                            <td>
-                                <a href="{% url 'billing:customer_update' customer.id %}" class="btn btn-sm btn-warning">Edit</a>
-                                <a href="{% url 'billing:customer_delete' customer.id %}" class="btn btn-sm btn-danger" 
-                                   onclick="return confirm('Are you sure you want to delete this customer?');">
-                                    Delete
-                                </a>
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="5" class="text-center py-4 text-muted">No customers found</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4 class="mb-0">Customers</h4>
+  <a class="btn btn-primary btn-sm" href="{% url 'billing:customer_create' %}">+ Add Customer</a>
+</div>
+<div class="card">
+  <div class="card-body table-responsive">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>#</th><th>Name</th><th>Phone</th><th>Email</th><th>Address</th><th>Created</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for c in customers %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ c.name }}</td>
+          <td>{{ c.phone|default:"-" }}</td>
+          <td>{{ c.email|default:"-" }}</td>
+          <td>{{ c.address|default:"-" }}</td>
+          <td>{{ c.created_at|date:"d M Y" }}</td>
+          <td>
+            <a href="{% url 'billing:customer_edit' c.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7" class="text-center text-muted">No customers.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
 {% endblock %}

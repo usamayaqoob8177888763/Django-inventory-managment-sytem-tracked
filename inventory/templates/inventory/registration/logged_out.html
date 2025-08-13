@@ -1,0 +1,10 @@
+{% extends 'inventory/base.html' %}
+{% block title %}Logged out{% endblock %}
+{% block content %}
+<div class="card shadow-sm mt-4">
+  <div class="card-body text-center">
+    <h5>You are logged out</h5>
+    <p><a href="{% url 'login' %}" class="btn btn-primary">Login again</a></p>
+  </div>
+</div>
+{% endblock %}

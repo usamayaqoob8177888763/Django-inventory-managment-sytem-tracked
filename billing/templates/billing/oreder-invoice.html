@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Invoice {{ order.invoice_number }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      .card { border: none; box-shadow: none; }
+    }
+  </style>
+</head>
+<body class="bg-light">
+<div class="container my-4">
+  <div class="no-print mb-3">
+    <a href="#" onclick="window.print()" class="btn btn-dark btn-sm">Print</a>
+    <a href="{% url 'billing:order_detail' order.id %}" class="btn btn-outline-secondary btn-sm">Back</a>
+  </div>
+
+  <div class="card p-4">
+    <div class="d-flex justify-content-between align-items-start">
+      <div>
+        <h3 class="mb-0">INVOICE</h3>
+        <small class="text-muted"># {{ order.invoice_number }}</small>
+      </div>
+      <div class="text-end">
+        <h5 class="mb-0">Your Company</h5>
+        <small>Street Address</small><br>
+        <small>City, ZIP</small><br>
+        <small>Phone / Email</small>
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+      <div class="col-md-6">
+        <h6 class="mb-1">Bill To</h6>
+        <div class="fw-semibold">{{ order.customer.name }}</div>
+        {% if order.customer.address %}<div>{{ order.customer.address }}</div>{% endif %}
+        <div class="small text-muted">
+          {% if order.customer.phone %}{{ order.customer.phone }}{% endif %}
+          {% if order.customer.email %} · {{ order.customer.email }}{% endif %}
+        </div>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <div><strong>Date:</strong> {{ order.date|date:"d M Y" }}</div>
+        <div><strong>Status:</strong> {{ order.get_status_display }}</div>
+        <div><strong>Payment:</strong> {{ order.get_payment_method_display }}</div>
+      </div>
+    </div>
+
+    <div class="table-responsive my-4">
+      <table class="table table-bordered align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Item</th>
+            <th class="text-end">Price</th>
+            <th class="text-center">Qty</th>
+            <th class="text-end">Line Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for it in order.items.all %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ it.product.name }}</td>
+            <td class="text-end">{{ it.unit_price }}</td>
+            <td class="text-center">{{ it.quantity }}</td>
+            <td class="text-end">{{ it.line_total }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="4" class="text-end">Subtotal</th>
+            <th class="text-end">{{ order.subtotal }}</th>
+          </tr>
+          <tr>
+            <th colspan="4" class="text-end">Tax</th>
+            <th class="text-end">{{ order.tax }}</th>
+          </tr>
+          <tr>
+            <th colspan="4" class="text-end">Discount</th>
+            <th class="text-end">- {{ order.discount }}</th>
+          </tr>
+          <tr class="table-light">
+            <th colspan="4" class="text-end">Grand Total</th>
+            <th class="text-end h5">{{ order.total }}</th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="text-center text-muted small">
+      Thank you for your business!
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,47 +1,62 @@
-
 {% extends 'inventory/base.html' %}
-{% load static %}
 {% block title %}Products{% endblock %}
+
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Products</h2>
-    <a href="{% url 'product-create' %}" class="btn btn-primary">➕ Add Product</a>
-</div>
-
-<form method="get" class="mb-4">
-    <div class="input-group">
-        <input type="text" name="q" class="form-control" placeholder="Search products..." value="{{ request.GET.q }}">
-        <button class="btn btn-outline-secondary" type="submit">Search</button>
+<div class="card shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="mb-0">Products</h5>
+    <div>
+      <a href="{% url 'inventory:product-create' %}" class="btn btn-primary btn-sm">+ Add Product</a>
     </div>
-</form>
+  </div>
 
-{% if products %}
-<div class="row g-4">
-    {% for product in products %}
-    <div class="col-md-4">
-        <div class="card shadow-sm h-100">
-            {% if product.image %}
-            <img src="{{ product.image.url }}" class="card-img-top" style="height:200px; object-fit:cover;" alt="{{ product.name }}">
-            {% else %}
-            <img src="{% static 'images/no-image.png' %}" class="card-img-top" style="height:200px; object-fit:cover;" alt="No image">
-            {% endif %}
-            <div class="card-body">
-                <h5 class="card-title">{{ product.name }}</h5>
-                <p class="card-text text-muted">{{ product.category.name }}</p>
-                <p class="card-text">Stock: <strong>{{ product.quantity }}</strong></p>
-                <p class="card-text text-success">Price: ${{ product.price }}</p>
-                <div class="d-flex justify-content-between">
-                    <a href="{% url 'product-detail' product.pk %}" class="btn btn-sm btn-info">View</a>
-                    <a href="{% url 'product-update' product.pk %}" class="btn btn-sm btn-warning">Edit</a>
-                    <a href="{% url 'product-delete' product.pk %}" class="btn btn-sm btn-danger">Delete</a>
-                </div>
-            </div>
-        </div>
+  <div class="card-body">
+    <form method="get" class="mb-3" role="search">
+      <div class="input-group">
+        <input type="search" name="q" value="{{ search_query }}" class="form-control" placeholder="Search products..." />
+        <button type="submit" class="btn btn-outline-secondary">Search</button>
+      </div>
+    </form>
+
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for product in products %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td><a href="{% url 'inventory:product-detail' product.pk %}">{{ product.name }}</a></td>
+            <td>{{ product.category.name }}</td>
+            <td>₹{{ product.price|floatformat:2 }}</td>
+            <td>
+              {% if product.quantity <= product.minimum_stock %}
+                <span class="badge bg-danger">Low ({{ product.quantity }})</span>
+              {% else %}
+                {{ product.quantity }}
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'inventory:product-update' product.pk %}" class="btn btn-sm btn-warning">Edit</a>
+              <a href="{% url 'inventory:product-delete' product.pk %}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" class="text-center text-muted">No products found.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-    {% endfor %}
+  </div>
 </div>
-{% else %}
-<div class="alert alert-info">No products found.</div>
-{% endif %}
 {% endblock %}
-
